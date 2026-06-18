@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>测测你的烟雨江湖有缘人</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Serif SC', serif;
+    background: #faf7f2;
+    color: #2c2420;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 3rem 1rem 4rem;
+  }
+  .wrap { width: 100%; max-width: 600px; }
+  .title { text-align: center; font-size: 26px; font-weight: 700; letter-spacing: 5px; margin-bottom: 6px; color: #2c2420; }
+  .subtitle { text-align: center; font-size: 13px; color: #8a7a6a; letter-spacing: 3px; margin-bottom: 2rem; }
+  .divider { display: flex; align-items: center; gap: 12px; margin: 0 auto 2.5rem; max-width: 360px; }
+  .divider-line { flex: 1; height: 1px; background: #d6cec4; }
+  .divider-diamond { width: 6px; height: 6px; background: #8a7a6a; transform: rotate(45deg); }
+  .progress-wrap { display: flex; align-items: center; gap: 12px; margin-bottom: 2rem; }
+  .progress-bar { flex: 1; height: 3px; background: #e0d8ce; border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; background: #8B4A2A; border-radius: 2px; transition: width 0.45s ease; }
+  .progress-label { font-size: 12px; color: #8a7a6a; letter-spacing: 1px; white-space: nowrap; }
+  .q-area { min-height: 340px; }
+  .q-num { font-size: 11px; color: #aaa; letter-spacing: 3px; margin-bottom: 10px; }
+  .q-text { font-size: 18px; line-height: 1.9; margin-bottom: 1.75rem; letter-spacing: 1px; color: #2c2420; }
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .opt {
+    padding: 13px 18px;
+    border: 1px solid #d6cec4;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #2c2420;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    line-height: 1.7;
+    transition: border-color 0.2s, background 0.2s, color 0.2s;
+    background: transparent;
+    font-family: 'Noto Serif SC', serif;
+    text-align: left;
+  }
+  .opt:hover { border-color: #8B4A2A; background: #f3ede5; color: #6b3520; }
+  .fade { animation: fadeUp 0.35s ease; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .result { text-align: center; padding: 0.5rem 0; }
+  .result-eyebrow { font-size: 12px; letter-spacing: 4px; color: #8a7a6a; margin-bottom: 10px; }
+  .result-name { font-size: 36px; font-weight: 700; letter-spacing: 8px; color: #2c2420; margin-bottom: 1.5rem; }
+  .result-tag { display: inline-block; font-size: 11px; border: 1px solid #8B4A2A; color: #8B4A2A; padding: 4px 14px; border-radius: 3px; letter-spacing: 2px; margin-bottom: 1.5rem; }
+  .result-card { border: 1px solid #e0d8ce; border-radius: 8px; padding: 1.5rem 1.75rem; text-align: left; background: #f3ede5; margin-bottom: 1.75rem; }
+  .result-card-label { font-size: 11px; letter-spacing: 3px; color: #aaa; margin-bottom: 10px; }
+  .result-desc { font-size: 14px; color: #4a3e34; line-height: 2.1; letter-spacing: 0.5px; }
+  .restart {
+    padding: 11px 36px;
+    border: 1px solid #d6cec4;
+    border-radius: 4px;
+    font-size: 13px;
+    color: #8a7a6a;
+    cursor: pointer;
+    font-family: 'Noto Serif SC', serif;
+    letter-spacing: 2px;
+    background: transparent;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .restart:hover { border-color: #8B4A2A; color: #8B4A2A; }
+  @media (max-width: 480px) {
+    .title { font-size: 22px; }
+    .q-text { font-size: 16px; }
+    .result-name { font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 class="title">烟雨江湖</h1>
+  <p class="subtitle">测测与你有缘的江湖人</p>
+  <div class="divider"><div class="divider-line"></div><div class="divider-diamond"></div><div class="divider-line"></div></div>
+  <div id="quiz-area"></div>
+</div>
+
+<script>
+const characters = {
+  陶渊溢: { tags: "落魄书生·痴情", desc: "此人原乃习圣贤书的赶考之人。只是突发不幸之事，害得他爱妻身死，之后此人失魂落魄，流落于江湖之上。" },
+  柳如意: { tags: "药谷天才·活泼", desc: "药王谷当代弟子辈中第一人，天性纯真，活泼开朗，瞒着药王偷跑出谷闯荡江湖，对于医术及炼丹有着非常高的天赋。" },
+  商昊乾: { tags: "堡主少爷·拼命", desc: "商家堡少主，打架不要命，且越战越勇，江湖人称「拼命三郎」。" },
+  丁小飞: { tags: "市井混混·机灵", desc: "杭州城内的一名小混混，整日无所事事，靠着见风使舵、左右逢源在城里头讨生活，也曾有过想独自闯荡江湖的美梦。" },
+  火工老僧: { tags: "厨艺传人·直爽", desc: "此人乃龙泉酒家主厨后人，继承其祖上精妙厨艺，不知为何入寺甘当数十年烧火僧。性子直爽，常将阿弥陀佛挂在嘴边，但杀起人来毫不手软，江湖人称铁棍常和尚。" },
+  萧佩吟: { tags: "百弦首席·顾全大局", desc: "百弦宫中最有望接任宫主的首席弟子，精通音律，尤其精通百弦共鸣之道。其人不善酒，一杯便醉，行事慎重，顾全大局，曾摆下七弦无音阵应战江湖群雄，在江湖上大展声名。" },
+  丐武圣: { tags: "丐帮长老·侠义", desc: "此人原为丐帮旗下九袋长老，生性自由，游历中原四处行乞。凭借绝妙身法劫富济贫，偶尔也会探偷各大派武书变卖换取银两，常于洛阳寻找有资质的后辈传授武艺，充满侠义心肠。" },
+  南知意: { tags: "小师妹·正义感", desc: "此人乃江南人氏，父亲是出名的豪侠宗师，因在门内辈分最小，众人亲切称呼其为「小师妹」；性格天真富有正义感，但常常犯路痴，分不清东南西北。" },
+  央蛮: { tags: "蛮山少女·赤诚", desc: "长于蛮山一带的神秘少女。精通傩舞腹语。自幼便随师父隐居山中，加之奇特的成长环境，似乎有些不通常理、不善沟通。常常喜欢对着傩面自言自语。但她奇异的外表下包裹着一颗赤诚纯善的心。" },
+  步惊云: { tags: "来历成谜·亦正亦邪", desc: "来历成谜的男子，有着跌宕神秘的过往。精通拳脚和剑法。周身气质凛然，面容坚毅俊朗，冷若冰霜。行事自有准则，我行我素，亦正亦邪。" },
+  于小雪: { tags: "神器转世·温柔坚韧", desc: "拥有神奇治愈能力的白发少女。容貌清丽，温柔善良，面薄爱害羞，珍视友谊。外表柔弱，实则坚韧，会为了心中信念与保护挚友而奋不顾身。真身乃是上古十大神器之一的女娲石化形转世之人。" },
+  薛龙城: { tags: "亡命刀客·孤傲嗜酒", desc: "此人乃枭雄之辈，曾封刀二十年，因旧仇卷入风波之中，个性刚直孤傲，嗜酒如命，是江湖中数一数二的亡命刀客，有龙胆凶刃之恶名。" },
+  桃花: { tags: "前白无常·心软杀手", desc: "原是阎罗殿下黑白无常里的白无常，后因一个少年，易名「桃花」。她的眼睛是玫瑰红，被人视为不祥，所以头上穿戴着黑纱斗笠。她是一个杀手，但是心却柔弱的像是一只小猫。" }
+};
+
+const keys = Object.keys(characters);
+
+const questions = [
+  {
+    text: "初入江湖，你最先想做的一件事是什么？",
+    opts: [
+      { text: "找一家酒馆，好好喝一顿，忘却过去", scores: { 陶渊溢: 2, 薛龙城: 3, 丁小飞: 1 } },
+      { text: "四处游历，行侠仗义，路见不平就出手", scores: { 丐武圣: 3, 南知意: 2, 商昊乾: 2 } },
+      { text: "找个师父或门派，好好磨炼武艺", scores: { 萧佩吟: 2, 步惊云: 2, 央蛮: 1 } },
+      { text: "先把这座城摸熟，认识认识各路人物再说", scores: { 丁小飞: 3, 柳如意: 2, 火工老僧: 1 } }
+    ]
+  },
+  {
+    text: "路过一处热闹的集市，你最先被什么吸引？",
+    opts: [
+      { text: "一家香气四溢的酒楼，顿时胃口大开", scores: { 火工老僧: 3, 薛龙城: 2, 陶渊溢: 1 } },
+      { text: "卖奇药秘方的摊子，凑过去看个究竟", scores: { 柳如意: 3, 于小雪: 2 } },
+      { text: "角落里卖艺比武的擂台，血气上涌", scores: { 商昊乾: 3, 南知意: 2, 丐武圣: 1 } },
+      { text: "街头卖唱的伶人，你停下脚步静静听了许久", scores: { 萧佩吟: 3, 桃花: 2, 陶渊溢: 1 } }
+    ]
+  },
+  {
+    text: "遇见一位素不相识的落难者，你会怎么做？",
+    opts: [
+      { text: "二话不说出手相助，不论对方是谁", scores: { 南知意: 3, 于小雪: 3, 丐武圣: 2 } },
+      { text: "先观察一番，确认没有陷阱再决定", scores: { 步惊云: 3, 萧佩吟: 2, 丁小飞: 1 } },
+      { text: "帮他包扎伤口，给他找点吃的，尽力而为", scores: { 柳如意: 3, 于小雪: 2, 陶渊溢: 2 } },
+      { text: "给他指一条出路，但不愿过多纠缠", scores: { 薛龙城: 3, 桃花: 2, 央蛮: 2 } }
+    ]
+  },
+  {
+    text: "你最欣赏哪种江湖人物？",
+    opts: [
+      { text: "侠骨柔肠，劫富济贫，快意恩仇", scores: { 丐武圣: 3, 南知意: 2, 商昊乾: 1 } },
+      { text: "深藏不露，运筹帷幄，从不轻易出手", scores: { 萧佩吟: 3, 步惊云: 3, 薛龙城: 1 } },
+      { text: "赤子之心，不问世事，随心所欲", scores: { 柳如意: 3, 央蛮: 2, 丁小飞: 2 } },
+      { text: "历尽沧桑，身负秘密，独自前行", scores: { 陶渊溢: 3, 桃花: 3, 步惊云: 2 } }
+    ]
+  },
+  {
+    text: "若要形容你平日的处世之道，最接近哪一句？",
+    opts: [
+      { text: "「能动手就别废话」，打了再说", scores: { 商昊乾: 3, 火工老僧: 2, 丐武圣: 1 } },
+      { text: "「见人说人话，见鬼说鬼话」，活下去最重要", scores: { 丁小飞: 3, 桃花: 1 } },
+      { text: "「医者仁心」，世间一切皆有解法", scores: { 柳如意: 3, 于小雪: 3 } },
+      { text: "「万事留一线，日后好相见」，不轻易树敌", scores: { 萧佩吟: 3, 陶渊溢: 2, 步惊云: 1 } }
+    ]
+  },
+  {
+    text: "夜宿破庙，同行人一一入睡，你独自醒着，心中想的是什么？",
+    opts: [
+      { text: "某个久远的往事，一个再也见不到的人", scores: { 陶渊溢: 3, 桃花: 3 } },
+      { text: "明日的行程，如何把事办得漂漂亮亮", scores: { 萧佩吟: 3, 商昊乾: 2 } },
+      { text: "今天经历的新奇事，心里还兴奋着", scores: { 柳如意: 3, 南知意: 2, 丁小飞: 1 } },
+      { text: "什么也没想，望着星空，心如止水", scores: { 步惊云: 3, 央蛮: 3, 于小雪: 1 } }
+    ]
+  },
+  {
+    text: "在江湖上，你最难以接受的事是什么？",
+    opts: [
+      { text: "所爱之人受苦，自己却无能为力", scores: { 陶渊溢: 3, 于小雪: 2, 桃花: 2 } },
+      { text: "被人看不起，出言侮辱，不给你面子", scores: { 商昊乾: 3, 薛龙城: 3 } },
+      { text: "被困一处，无法自由行走闯荡", scores: { 柳如意: 3, 丐武圣: 2, 央蛮: 2 } },
+      { text: "做了该做的事，却换来误解与猜疑", scores: { 步惊云: 3, 南知意: 2, 丁小飞: 1 } }
+    ]
+  },
+  {
+    text: "有人问你：「你学武功，究竟是为了什么？」你会怎么说？",
+    opts: [
+      { text: "「为了保护我想保护的人。」", scores: { 于小雪: 3, 南知意: 2, 陶渊溢: 2 } },
+      { text: "「为了一口气，一个交代。」", scores: { 薛龙城: 3, 步惊云: 2, 桃花: 2 } },
+      { text: "「好玩啊，打架很刺激嘛。」", scores: { 商昊乾: 3, 丁小飞: 2, 柳如意: 1 } },
+      { text: "「传承武学，惠泽后人。」", scores: { 丐武圣: 3, 火工老僧: 2, 萧佩吟: 1 } }
+    ]
+  }
+];
+
+let scores = {};
+keys.forEach(k => scores[k] = 0);
+let current = 0;
+
+function render() {
+  const area = document.getElementById('quiz-area');
+  area.innerHTML = '';
+  if (current < questions.length) {
+    const q = questions[current];
+    const pct = Math.round((current / questions.length) * 100);
+    area.innerHTML = `
+      <div class="progress-wrap">
+        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+        <span class="progress-label">${current + 1} / ${questions.length}</span>
+      </div>
+      <div class="q-area fade">
+        <div class="q-num">第 ${current + 1} 题</div>
+        <div class="q-text">${q.text}</div>
+        <div class="options">
+          ${q.opts.map((o, i) => `<button class="opt" data-idx="${i}">${o.text}</button>`).join('')}
+        </div>
+      </div>
+    `;
+    area.querySelectorAll('.opt').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const idx = parseInt(this.dataset.idx);
+        const scoreMap = q.opts[idx].scores;
+        Object.entries(scoreMap).forEach(([c, v]) => { scores[c] = (scores[c] || 0) + v; });
+        current++;
+        render();
+      });
+    });
+  } else {
+    showResult();
+  }
+}
+
+function showResult() {
+  const winner = keys.reduce((a, b) => scores[a] >= scores[b] ? a : b);
+  const c = characters[winner];
+  const area = document.getElementById('quiz-area');
+  area.innerHTML = `
+    <div class="result fade">
+      <div class="result-eyebrow">与你有缘的江湖人</div>
+      <div class="result-name">${winner}</div>
+      <div class="result-tag">${c.tags}</div>
+      <div class="result-card">
+        <div class="result-card-label">江湖档案</div>
+        <div class="result-desc">${c.desc}</div>
+      </div>
+      <button class="restart" onclick="restart()">重新测试</button>
+    </div>
+  `;
+}
+
+function restart() {
+  keys.forEach(k => scores[k] = 0);
+  current = 0;
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
